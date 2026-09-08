@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# macOS
+.DS_Store
+
+# Local data files
+data/GSE260786_bulk.xlsx
