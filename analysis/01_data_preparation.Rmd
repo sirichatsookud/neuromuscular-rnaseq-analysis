@@ -26,7 +26,7 @@ Rows without valid Ensembl gene identifiers were excluded. Ensembl gene IDs were
 ```{r}
 raw_counts <- raw_data[-1, ] %>% filter(grepl("^ENSG", Geneid)) %>% column_to_rownames("Geneid") %>%mutate(across(everything(), as.numeric))
 
-#พemove genes with missing count values
+#remove genes with missing count values
 raw_counts <- raw_counts[rowSums(is.na(raw_counts)) == 0,]
 
 #check
