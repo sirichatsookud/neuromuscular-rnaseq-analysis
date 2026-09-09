@@ -1,1 +1,52 @@
+# Data preparation
+This notebook prepares the publicly available RNA-seq count data from GSE260786 for downstream analysis.
 
+# Load data
+```{r}
+library(readxl)
+library(dplyr)
+library(tibble)
+library(here)
+
+raw_data <- read_excel(here("data", "GSE260786_bulk.xlsx"))
+
+dim(raw_data)
+colnames(raw_data)[1:10]
+```
+
+# Prepare sample metadata
+```{r}
+metadata <- data.frame(Sample = colnames(raw_data)[-1], Group = as.character(raw_data[1, -1]),stringsAsFactors = FALSE)
+
+table(metadata$Group)
+```
+
+# Prepare count matrix
+Rows without valid Ensembl gene identifiers were excluded. Ensembl gene IDs were then used as row names, read counts were converted to numeric values, and genes containing missing count values were removed.
+```{r}
+raw_counts <- raw_data[-1, ] %>% filter(grepl("^ENSG", Geneid)) %>% column_to_rownames("Geneid") %>%mutate(across(everything(), as.numeric))
+
+#พemove genes with missing count values
+raw_counts <- raw_counts[rowSums(is.na(raw_counts)) == 0,]
+
+#check
+identical(colnames(raw_counts), metadata$Sample) #TRUE
+```
+
+# Validate count matrix
+Basic checks were performed to ensure that the count matrix contained unique gene identifiers and valid non-negative integer counts before downstream analysis.
+```{r}
+#check duplicated gene IDs
+sum(duplicated(rownames(raw_counts))) #0
+
+#check missing values
+sum(is.na(raw_counts)) #0
+
+#check negative counts
+sum(as.matrix(raw_counts) < 0) #0
+
+#check non-integer counts
+sum(as.matrix(raw_counts) %% 1 != 0) #0
+```
+
+The cleaned count matrix and sample metadata were successfully prepared for downstream analysis.
