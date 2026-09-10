@@ -1,5 +1,5 @@
 # Neuromuscular RNA-seq Analysis
-To explore transcriptomic variation across idiopathic inflammatory myopathy subgroups using bulk RNA-seq.
+To characterize gene expression differences between idiopathic inflammatory myopathy and control skeletal muscle using publicly available bulk RNA-seq data.
 
 ## Dataset
 - GEO accession: GSE260786
