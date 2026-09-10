@@ -53,3 +53,4 @@ rsconnect/
 
 # Local data files
 data/GSE260786_bulk.xlsx
+data/*.rds

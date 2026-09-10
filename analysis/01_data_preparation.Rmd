@@ -19,6 +19,10 @@ colnames(raw_data)[1:10]
 metadata <- data.frame(Sample = colnames(raw_data)[-1], Group = as.character(raw_data[1, -1]),stringsAsFactors = FALSE)
 
 table(metadata$Group)
+
+# Subset only IIM and Control
+metadata_iim <- metadata %>% filter(Group %in% c("ASYS", "DM", "IBM", "IMNM", "Control")) %>%
+  mutate(analysis_group = ifelse(Group == "Control", "Control", "IIM"))
 ```
 
 # Prepare count matrix
@@ -29,24 +33,35 @@ raw_counts <- raw_data[-1, ] %>% filter(grepl("^ENSG", Geneid)) %>% column_to_ro
 #remove genes with missing count values
 raw_counts <- raw_counts[rowSums(is.na(raw_counts)) == 0,]
 
-#check
-identical(colnames(raw_counts), metadata$Sample) #TRUE
+#subset count matrix to IIM and Control samples
+raw_counts_iim <- raw_counts[, metadata_iim$Sample]
+
+#check sample order
+identical(colnames(raw_counts_iim), metadata_iim$Sample) #TRUE
 ```
 
 # Validate count matrix
 Basic checks were performed to ensure that the count matrix contained unique gene identifiers and valid non-negative integer counts before downstream analysis.
 ```{r}
 #check duplicated gene IDs
-sum(duplicated(rownames(raw_counts))) #0
+sum(duplicated(rownames(raw_counts_iim))) #0
 
 #check missing values
-sum(is.na(raw_counts)) #0
+sum(is.na(raw_counts_iim)) #0
 
 #check negative counts
-sum(as.matrix(raw_counts) < 0) #0
+sum(as.matrix(raw_counts_iim) < 0) #0
 
 #check non-integer counts
-sum(as.matrix(raw_counts) %% 1 != 0) #0
+sum(as.matrix(raw_counts_iim) %% 1 != 0) #0
 ```
+
+# Save
+```{r}
+saveRDS(raw_counts_iim,here("data", "raw_counts_iim_control.rds"))
+
+saveRDS(metadata_iim,here("data", "metadata_iim_control.rds"))
+```
+
 
 The cleaned count matrix and sample metadata were successfully prepared for downstream analysis.

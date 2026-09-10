@@ -1,0 +1,77 @@
+# Quality control and PCA
+This notebook performs quality control, gene filtering, and exploratory analysis of the GSE260786 RNA-seq dataset.
+
+# Load packages
+```{r}
+library(dplyr)
+library(ggplot2)
+library(edgeR)
+library(here)
+```
+
+# Load data
+```{r}
+raw_counts <- readRDS(here("data", "raw_counts_iim_control.rds"))
+
+metadata <- readRDS(here("data", "metadata_iim_control.rds"))
+
+#check
+dim(raw_counts)
+dim(metadata)
+identical(colnames(raw_counts), metadata$Sample)
+```
+
+# Sample-level QC
+```{r}
+# Library size
+library_size <- colSums(raw_counts)
+summary(library_size)
+
+# Detected genes
+detected_genes <- colSums(raw_counts > 0)
+summary(detected_genes)
+
+# QC dataframe
+sample_qc <- metadata_iim %>% mutate(
+    library_size = library_size[Sample],
+    detected_genes = detected_genes[Sample],
+    Sample = factor(Sample, levels = rev(colnames(raw_counts_iim))))
+
+head(sample_qc)
+```
+
+# Plot library size
+```{r}
+
+analysis_colors <- c("Control" = "#F5BB27","IIM" = "#78E2DB")
+
+ggplot(sample_qc,aes(x =  Sample,y = library_size / 1e6,fill = analysis_group)) +
+  geom_col(width = 0.75) +
+  coord_flip() +
+  scale_fill_manual(values = analysis_colors) +
+  labs(x = NULL, y = "Library size (million reads)",fill = "Group") +
+  theme_classic(base_size = 12) +
+  theme(
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(color = "black"),
+    legend.position = "right")
+```
+
+# Plot detected genes
+```{r}
+ggplot(sample_qc,aes(x = Sample,y = detected_genes,fill = analysis_group)) +
+  geom_col(width = 0.75) +
+  coord_flip() +
+  scale_fill_manual(values = analysis_colors) +
+  labs(x = NULL,y = "Number of detected genes",fill = "Group") +
+  theme_classic(base_size = 12) +
+  theme(
+    axis.text = element_text(color = "black"),
+    axis.title = element_text(color = "black"),
+    legend.position = "right")
+```
+
+
+
+
+
