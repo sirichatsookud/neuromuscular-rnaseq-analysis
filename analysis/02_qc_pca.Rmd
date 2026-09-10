@@ -45,9 +45,8 @@ head(sample_qc)
 
 analysis_colors <- c("Control" = "#F5BB27","IIM" = "#78E2DB")
 
-ggplot(sample_qc,aes(x =  Sample,y = library_size / 1e6,fill = analysis_group)) +
+ggplot(sample_qc,aes(x =  library_size / 1e6,y = Sample,fill = analysis_group)) +
   geom_col(width = 0.75) +
-  coord_flip() +
   scale_fill_manual(values = analysis_colors) +
   labs(x = NULL, y = "Library size (million reads)",fill = "Group") +
   theme_classic(base_size = 12) +
@@ -59,9 +58,8 @@ ggplot(sample_qc,aes(x =  Sample,y = library_size / 1e6,fill = analysis_group)) 
 
 # Plot detected genes
 ```{r}
-ggplot(sample_qc,aes(x = Sample,y = detected_genes,fill = analysis_group)) +
+ggplot(sample_qc,aes(x = detected_genes,y = Sample,fill = analysis_group)) +
   geom_col(width = 0.75) +
-  coord_flip() +
   scale_fill_manual(values = analysis_colors) +
   labs(x = NULL,y = "Number of detected genes",fill = "Group") +
   theme_classic(base_size = 12) +
